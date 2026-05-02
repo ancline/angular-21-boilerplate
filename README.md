@@ -26,3 +26,61 @@ This project is a beginner-friendly Angular 21 boilerplate that demonstrates a c
 
   - Node.js (LTS recommended)
   - npm (cones with Node.js)
+  - (Optional) Angular CLI:
+    - `npm i -g @angular/cli`
+
+## 2) Run the app (real API)
+
+By default this project is set up to call a real API at:
+
+- `http://localhost:4000` (see `src/environments/environment.ts`)
+
+### Setp 1: Install packages
+
+from the project root (where `package.json` is):
+
+```bash
+npm install
+```
+
+### Step 2: start your backend API
+
+Start an API that implements the `/accounts/*` endpoints described in the [How authentication works](#5-how-authentication-works) section.
+
+The frontend expects the API to be available at `http://localhost:4000` by default.
+
+### Step 3: start Angular
+
+```bash
+npm start
+```
+
+This runs `ng serve --open` and should open the app in your browser.
+
+#### Step 4: update API URL (if your API runs elsewhere)
+
+Edit the environment file:
+
+- `src/environments/environment.ts` (development)
+- `src/environments/environment.prod.ts` (production build)
+
+Update:
+
+```ts
+apiURL: 'http://localhost:4000'
+```
+
+## 3) Run the app (fake backend, no API)
+
+If you want to run everything full in the browser (no backend), you can enable the built-in fake backend interceptor.
+
+### Step 1: enable the fake backend provider
+
+Open `src/app/app.module.ts` and uncomment the `fakeBackendProvider` line in the `providers` array.
+
+It should look like this:
+
+```ts
+    provider: [
+        {  }
+    ]
