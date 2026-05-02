@@ -81,6 +81,59 @@ Open `src/app/app.module.ts` and uncomment the `fakeBackendProvider` line in the
 It should look like this:
 
 ```ts
-    provider: [
-        {  }
-    ]
+   providers: [
+        { provide: APP_INITIALIZER, useFactory: appInitializer, multi: true, deps: [AccountService] },
+        { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
+        { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
+
+        // provider used to create fake backend
+        fakeBackendProvider
+    ],
+```
+
+### Step 2: run the app
+
+```bash
+npm install
+npm start
+```
+
+### How the fake backend behaves (important for beginners)
+
+- Accounts are stored in your browser `localStorage`, not in a database.
+- "Emails" (verification + reset password links) are displayed in the UI as alerts because a browser-only app can't send real emails.
+- The first registered account becomes `Admin`, and all other accounts become `User`.
+
+If you want a clean slate while using the fake backend, clear site date in your browser or remove the local storage key:
+
+- `angular-15-setup-verification-boilerplate-accounts`
+
+## 4) Using the app (what to click)
+
+This section assumes you are starting fresh and want to see the full flow.
+
+### A) Create an account
+
+1. Go to Register
+2. Fill in your details and submit
+3. If you are using the fake backend, a "verification email" will appear as an alert with a link
+4. Click the verification link (or paste it in the browser) to verify your account
+
+### B) Login
+
+1. Go to Login
+2. Enter your email + password
+3. On success you'll be redirected to the home page
+
+### C) Forgot password + reset password
+
+1. Go to Forgot Password
+2. Enter your email and submit
+3. If you are using the fake backend, a "reset password email" will appear as an alert with a link
+4. Click the reset link and set a new password
+
+### 5) How authentication works
+
+This boilerplate uses two tokens:
+
+ - Access token (JWT)
