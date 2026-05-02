@@ -203,7 +203,12 @@ export class FakeBackendInterceptor implements HttpInterceptor {
                 if (!isAuthenticated()) return unauthorized();
                 return ok(accounts.map(x => basicDetails(x)));
 
-                let account = accounts.find(x => === idFromUrl());
+            }
+
+            function getAccountsById() {
+                if (!isAuthenticated()) return unauthorized();
+                
+                let account = accounts.find(x => x.id === idFromUrl());
 
                 if (account.id !== currentAccount().id && !iaAuthorized(Role.Admin)) {
                     return unauthorized();
@@ -277,6 +282,74 @@ export class FakeBackendInterceptor implements HttpInterceptor {
                     .pipe(materialize(), delay(500), dematerialize());
             }
 
-            
+            function unauthorized() {
+                return throwError(() => ({ status: 401, error: { message: 'Unauthorized' } }))
+                    .pipe(materialize(), delay(500), dematerialize());
+            }
+
+            function basicDetails(account: any) {
+                const { id, title, firstName, lastName, email, role, dateCreated, isVerified } = account;
+                return { id, title, firstName, lastName, email, role, dateCreated, isVerified };
+            }
+
+            function isAuthenticated() {
+                return !!currentAccount();
+            }
+
+            function isAuthorized(role: any) {
+                const account = currentAccount();
+                if (!account) return false;
+                return account.role === role;
+            }
+
+            function idFromUrl() {
+                const urlParts = url.split('/');
+                return parseInt(urlParts[urlParts.length - 1]);
+            }
+
+            function newAccountId() {
+                return accounts.length ? Math.max(...accounts.map(x => x.id)) + 1 : 1;
+            }
+
+            function currentAccount() {
+                const authHeader = headers.get('Authorization');
+                if (!authHeader || !authHeader.startsWith('Bearer fake-jwt-token')) return;
+
+                const jwtToken = JSON.parse(atob(authHeader.split('.')[1]));
+                const tokenExpired = Date.now() > (jwtToken.exp * 1000);
+                if (tokenExpired) return;
+
+                const account = accounts.find(x => x.id === jwtToken.id);
+                return account;
+            }
+
+            function generateJwtToken(account: any) {
+                const tokenPayLoad ={
+                    exp: Math.round(new Date(Date.now) + 15*60*1000).getTime() / 1000,
+                    id: account.id
+                }
+                return `fake-jwt-token.${btoa(JSON.stringify(tokenPayLoad))}`;
+            }
+
+            function generateRefreshToken() {
+                const token = new Date().getTime().toString();
+
+                const expires = new Date(new Date().getTime() + 7*24*60*60*1000).toUTCString();
+                document.cookie = `fake-refresh-token=${token}; expires=${expires}; path=/`;
+
+                return token;
+
+            }
+
+            function getRefreshToken() {
+                return (document.cookie.split(';').find(x => x.includes('fakeRefreshToken')) || '=').split('=')[1];
+            }
         }
     }
+    
+export let fakeBackendProvider = {
+    provide: HTTP_INTERCEPTORS,
+    useClasses: FakeBackendInterceptor,
+    multi: true
+
+};
