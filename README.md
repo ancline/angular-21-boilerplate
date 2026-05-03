@@ -132,8 +132,34 @@ This section assumes you are starting fresh and want to see the full flow.
 3. If you are using the fake backend, a "reset password email" will appear as an alert with a link
 4. Click the reset link and set a new password
 
-### 5) How authentication works
+### D) Profile and Admin areas
+
+- Profile pages allow you to view and update your own account details.
+- The Admin area is restricted to accounts with the `Admin` role.
+
+## 5) How authentication works
 
 This boilerplate uses two tokens:
 
- - Access token (JWT)
+- Access token (JWT): short-lived token used in the `Authorization: Bearer <token>` header
+- Refresh token: long-lived token stored in a cookie and sent with `withCreadentials: true`
+
+### The important pieces
+
+- API base URL:
+    - `src/environments/environment.ts`
+- Account service (login/logout/refresh/register/etc.):
+    - `src/app/_services/account.service.ts`
+- App initializer (tries to refresh on first app load):
+    - `src/app/_helpers/app.initializer.ts`
+- JWT interceptor (adds the `Authorization` header for API calls):
+    - `src/app/_helpers/jwt.interceptor.ts`
+- Error interceptor (auto-logout on 401/403):
+    - `src/app/_helpers/error.interceptor.ts`
+
+### Flow: login
+
+1. Login component calls `AccountService.login(email, password)`
+2. The API returns an `Account` object that includes `jwtToken`
+3. The app stores the account in memory (a `BehaviorSubject`) and starts a refresh timer
+4. For future API requests, the JWT interceptor attaches `Authorization: Bearer ...`
