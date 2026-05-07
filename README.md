@@ -163,3 +163,28 @@ This boilerplate uses two tokens:
 2. The API returns an `Account` object that includes `jwtToken`
 3. The app stores the account in memory (a `BehaviorSubject`) and starts a refresh timer
 4. For future API requests, the JWT interceptor attaches `Authorization: Bearer ...`
+
+### Flow: refresh token (important)
+
+1. The refresh token is sent to the API using cookies (`withCredentials: true`)
+2. The API responds with a new access token (`jwtToken`)
+3. The app schedules an automatic refresh about 1 minute before the access token expires
+4. When you reload the page, `APP_INITIALIZER` calls refresh immediately to restore the session (if the cookie is still valid)
+
+### Expected API endpoints
+
+The frontend calls these endpoints (base URL is `environment.apiUrl`):
+
+- `POST /accounts/authenticate`
+- `POST /accounts/refresh-token`
+- `POST /accounts/revoke-token`
+- `POST /accounts/register`
+- `POST /accounts/verify-email`
+- `POST /accounts/forgot-password`
+- `POST /accounts/validate-reset-token`
+- `POST /accounts/reset-password`
+- `GET /accounts` (Admin)
+- `GET /accounts/:id`
+- `POST /accounts` (Admin)
+- `PUT /accounts/:id`
+- `DELETE /accounts/:id`  

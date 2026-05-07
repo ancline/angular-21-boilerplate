@@ -1,6 +1,6 @@
 <h3 class="card-header">Register</h3>
 <div class="card-body">
-  <form #formGroup="ngForm" (ngSubmit)="onSubmit()">
+   <form [formGroup]="form" (ngSubmit)="onSubmit()">
     
     <div class="row">
       <div class="mb-3 col-2">

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpsRequest, HttpResponse, HttpHandler, HttpInterceptor, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { HttpRequest, HttpResponse, HttpHandler, HttpEvent, HttpInterceptor, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { Observable, of, throwError } from 'rxjs';
 import { delay, materialize, dematerialize } from 'rxjs/operators';
 
@@ -107,7 +107,7 @@ export class FakeBackendInterceptor implements HttpInterceptor {
                         <p>Your Emial ${account.email} is already registered.</p>
                         <p>If you don't know your password please visit the <a href="${location.origin}/account/forgot-password"> forgot password</a> page.</p>
                         <div><strong>Note:</strong> This is a fake backenddisplayed this "email" so you can test without an api. A real backend would send a real email.</div>
-                        `, {autoCLose: false});
+                        `, {autoClose: false});
                 }, 1000);
                 return ok();
             }
@@ -134,7 +134,7 @@ export class FakeBackendInterceptor implements HttpInterceptor {
                     <p>Please click the below link to verify your email address:</p>
                     <a href="${verifyUrl}">${verifyUrl}</a>
                     <div><strong>NOTE:</strong> This is a fake backenddisplayed this "email" so you can test without an api. A real backend would send a real email.</div>
-                `, {autoCLose: false});
+                `, {autoClose: false});
              }, 1000);
 
              return ok();
@@ -169,7 +169,7 @@ export class FakeBackendInterceptor implements HttpInterceptor {
                         <p>Please click the below link to reset your password, the link is valid for 24 hours:</p>
                         <a href="${resetUrl}">${resetUrl}</a>
                         <div><strong>NOTE:</strong> This is a fake backenddisplayed this "email" so you can test without an api. A real backend would send a real email.</div>
-                    `, {autoCLose: false});
+                    `, {autoClose: false});
                 }, 1000);
 
                 return ok();
@@ -186,7 +186,7 @@ export class FakeBackendInterceptor implements HttpInterceptor {
 
             function resetPassword() {
                 const { token, password } = body;
-                const account = accounts.find(x => !!x.resetToken && x.resetToekn === token && new DataTransfer() < new DataTransfer(x.resetTokenExpires));
+                const account = accounts.find(x => !!x.resetToken && x.resetToken === token && new Date() < new Date(x.resetTokenExpires));
 
                 if (!account) return error('Invalid token');
 
@@ -210,7 +210,7 @@ export class FakeBackendInterceptor implements HttpInterceptor {
                 
                 let account = accounts.find(x => x.id === idFromUrl());
 
-                if (account.id !== currentAccount().id && !iaAuthorized(Role.Admin)) {
+                if (account.id !== currentAccount().id && !isAuthorized(Role.Admin)) {
                     return unauthorized();
                 }
 
@@ -218,7 +218,7 @@ export class FakeBackendInterceptor implements HttpInterceptor {
             }
 
             function createAccount() {
-                if (!isAuhtorized(Role.Admin)) return unauthorized();
+                if (!isAuthorized(Role.Admin)) return unauthorized();
 
                 const account = body;
                 if (accounts.find(x => x.email === account.email)) {
@@ -325,7 +325,7 @@ export class FakeBackendInterceptor implements HttpInterceptor {
 
             function generateJwtToken(account: any) {
                 const tokenPayLoad ={
-                    exp: Math.round(new Date(Date.now) + 15*60*1000).getTime() / 1000,
+                    exp: Math.round((Date.now() + 15*60*1000) / 1000),
                     id: account.id
                 }
                 return `fake-jwt-token.${btoa(JSON.stringify(tokenPayLoad))}`;

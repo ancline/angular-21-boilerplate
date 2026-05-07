@@ -1,30 +1,28 @@
 import { ChangeDetectorRef, Component, OnInit, OnDestroy, Input } from '@angular/core';
-import { Router, Navigation } from '@angular/router';
+import { Router, NavigationStart } from '@angular/router';
 import { Subscription } from 'rxjs';
 
-import { Alert, AlertType } from '@app/_models';
-import { AlertService } from '@app/_services';
+import { Alert, AlertType } from '../_models/alert';
+import { AlertService } from '../_services/alert.service';
 
 @Component({ selector: 'alert', templateUrl: 'alert.component.html', standalone: false })
 export class AlertComponent implements OnInit, OnDestroy {
-    private scheduleDetectChanges() {
-        setTimeout(() => this.cdr.detectChanges());
-    }
-    @Input() id ='default-alert';
-    @Input() fade= true;
+    @Input() id = 'default-alert';
+    @Input() fade = true;
 
     alerts: Alert[] = [];
     alertSubscription!: Subscription;
     routeSubscription!: Subscription;
 
     constructor(
-        private router: Router;
-        private alertService: AlertService;
+        private router: Router,
+        private alertService: AlertService,
         private cdr: ChangeDetectorRef
-    ) { }
+    ) {}
+
     ngOnInit() {
         this.alertSubscription = this.alertService.onAlert(this.id)
-            .subcribe(alert => {
+            .subscribe(alert => {
                 if (!alert.message) {
                     this.alerts = this.alerts.filter(x => x.keepAfterRouteChange);
                     this.alerts.forEach(x => delete x.keepAfterRouteChange);
@@ -39,7 +37,8 @@ export class AlertComponent implements OnInit, OnDestroy {
                     setTimeout(() => this.removeAlert(alert), 3000);
                 }
             });
-        this.routeSubscription = this.router.events.subcribe(event => {
+
+        this.routeSubscription = this.router.events.subscribe(event => {
             if (event instanceof NavigationStart) {
                 this.alertService.clear(this.id);
                 this.scheduleDetectChanges();
@@ -48,8 +47,8 @@ export class AlertComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy() {
-        this.alertService.unsubcribe();
-        this.routeSubscription.unsubcribe();
+        this.alertSubscription.unsubscribe();
+        this.routeSubscription.unsubscribe();
     }
 
     removeAlert(alert: Alert) {
@@ -70,16 +69,16 @@ export class AlertComponent implements OnInit, OnDestroy {
     }
 
     cssClasses(alert: Alert) {
-        if (!alert) return;
+        if (!alert) return '';
 
-        const classes = ['alert', 'alert-dismissable', 'mt-4', 'container'];
+        const classes = ['alert', 'alert-dismissible', 'mt-4', 'container'];
 
         const alertTypeClass = {
             [AlertType.Success]: 'alert-success',
             [AlertType.Error]: 'alert-danger',
             [AlertType.Info]: 'alert-info',
             [AlertType.Warning]: 'alert-warning'
-        }
+        };
 
         if (alert.type !== undefined) {
             classes.push(alertTypeClass[alert.type]);
@@ -90,5 +89,9 @@ export class AlertComponent implements OnInit, OnDestroy {
         }
 
         return classes.join(' ');
+    }
+
+    private scheduleDetectChanges() {
+        setTimeout(() => this.cdr.detectChanges());
     }
 }

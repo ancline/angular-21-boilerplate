@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Router, ActivatedRouter } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { first } from 'rxjs/operators';
 
@@ -66,7 +66,7 @@ export class ResetPasswordComponent implements OnInit {
         }
 
         this.loading = true;
-        this.accountService.resetPassword({ token: this.token!, password: this.f.password.value })
+        this.accountService.resetPassword(this.token!, this.f.password.value, this.f.confirmPassword.value)
             .pipe(first())
             .subscribe({
                 next: () => {

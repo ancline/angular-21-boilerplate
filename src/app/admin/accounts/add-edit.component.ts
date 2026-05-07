@@ -35,7 +35,7 @@ export class AddEditComponent implements OnInit, OnDestroy {
             lastName: ['', Validators.required],
             email: ['', [Validators.required, Validators.email]],
             role: ['', Validators.required],
-            password: ['', [Validators.minLength(6), ...(!this.id ? Validators.required : [])]],
+             password: ['', [Validators.minLength(6), ...(!this.id ? [Validators.required] : [])]],
             confirmPassword: ['']
         }, {
             validator: MustMatch('password', 'confirmPassword')
@@ -68,7 +68,7 @@ export class AddEditComponent implements OnInit, OnDestroy {
                     })
                         
                 )
-                .subdcribe({
+                .subscribe({
                     next: x => {
                         this.form.patchValue(x);
                         this.cdr.detectChanges();

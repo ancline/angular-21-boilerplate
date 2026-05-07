@@ -1,12 +1,12 @@
-import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angilar/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { finalize, first } from 'rxjs/operators';
 
 import { AccountService, AlertService } from '@app/_services';
 
-@Component ({ templateurl: 'list.component.html', standalone: false })
+@Component ({ templateUrl: 'list.component.html', standalone: false })
 export class ListComponent implements OnInit, OnDestroy {
     accounts: any[] = [];
-    loading: false;
+    loading = false;
 
     private loadTimeoutId?: number;
 
