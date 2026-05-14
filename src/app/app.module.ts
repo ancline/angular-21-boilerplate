@@ -27,6 +27,7 @@ import { HomeComponent } from './home/home.component';
     { provide: APP_INITIALIZER, useFactory: appInitializer, multi: true, deps: [AccountService] },
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
+    fakeBackendProvider
     
   ],
   bootstrap: [AppComponent]

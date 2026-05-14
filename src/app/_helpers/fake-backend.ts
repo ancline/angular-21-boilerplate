@@ -342,14 +342,14 @@ export class FakeBackendInterceptor implements HttpInterceptor {
             }
 
             function getRefreshToken() {
-                return (document.cookie.split(';').find(x => x.includes('fakeRefreshToken')) || '=').split('=')[1];
+                return (document.cookie.split(';').find(x => x.includes('fake-refresh-token')) || '=').split('=')[1];
             }
         }
     }
     
 export let fakeBackendProvider = {
     provide: HTTP_INTERCEPTORS,
-    useClasses: FakeBackendInterceptor,
+    useClass: FakeBackendInterceptor,
     multi: true
 
 };
